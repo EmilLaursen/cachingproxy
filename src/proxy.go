@@ -53,10 +53,12 @@ func NewHttpCacheProxy(
 	// overwrite transport
 	transport := CachingTransport{cache: cache}
 	proxy.Transport = &transport
+
 	proxy.ModifyResponse = func(resp *http.Response) error {
 		resp.Header.Add("X-Cache-Timestamp", fmt.Sprint(time.Now().Unix()))
 		return nil
 	}
+
 	cachingProxy := HttpCacheProxy{
 		Cache:       cache,
 		target:      url,
@@ -68,7 +70,6 @@ func NewHttpCacheProxy(
 }
 
 func (p *HttpCacheProxy) Handle(wr http.ResponseWriter, req *http.Request) {
-	wr.Header().Set("X-GoProxy", "GoProxy")
 	req.Header.Del("X-Forwarded-For")
 
 	if p.saveMetrics {
